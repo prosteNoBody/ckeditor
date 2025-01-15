@@ -24,7 +24,7 @@
     "build:field": "vite build -c ./src/web/assets/ckeditor/vite.config.js",
     "build": "npm-run-all -p build:*",
     "postbuild": "npm-run-all copy:*",
-    "dev": "npm-run-all -p \"build:* -- -w --mode=development\"",
+    "dev": "npm-run-all -p \"build:* -- -w --mode=development --minify=false\"",
     "predev": "npm-run-all copy:*",
     "precopy:lib": "rm -r ./src/web/assets/ckeditor/dist/lib || true",
     "copy:browser": "cp -r ./node_modules/ckeditor5/dist/browser/ ./src/web/assets/ckeditor/dist/lib",

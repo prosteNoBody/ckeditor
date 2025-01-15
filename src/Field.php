@@ -20,6 +20,7 @@ use craft\ckeditor\data\FieldData;
 use craft\ckeditor\data\Markup;
 use craft\ckeditor\events\DefineLinkOptionsEvent;
 use craft\ckeditor\events\ModifyConfigEvent;
+use craft\ckeditor\helpers\Toolbar;
 use craft\ckeditor\web\assets\BaseCkeditorPackageAsset;
 use craft\ckeditor\web\assets\ckeditor\CkeditorAsset;
 use craft\db\FixedOrderExpression;
@@ -862,7 +863,7 @@ class Field extends HtmlField implements ElementContainerFieldInterface, Mergeab
         $toolbar = array_values($toolbar);
 
         $id = Html::id($this->handle);
-        $idJs = Json::encode($view->namespaceInputId($id));
+        $idJs = Json::encode('#' . $view->namespaceInputId($id));
         $wordCountId = "$id-counts";
         $wordCountIdJs = Json::encode($view->namespaceInputId($wordCountId));
 
@@ -951,6 +952,48 @@ JS;
             $configOptionsJs = '{}';
         }
 
+        $removePlugins = Collection::empty();
+        // $removePlugins = collect(Plugin::$pluginButtonMap)
+        //     ->filter(function($mapping) use ($event) {
+        //         $buttons = $mapping['buttons'] ?? [];
+        //         return collect($event->toolbar)
+        //             ->some(function($button) use ($buttons) {
+        //                 return !in_array($button, $buttons);
+        //             });
+        //     })
+        //     ->map(fn($mapping) => $mapping['plugins'])
+        //     ->flatten();
+
+        // Craft::dd($removePlugins);
+
+        // remove MediaEmbedToolbar for now
+        // see: https://github.com/ckeditor/ckeditor5-react/issues/267
+        // and: https://github.com/ckeditor/ckeditor5/issues/9824
+        // for more info
+        $removePlugins->push('MediaEmbedToolbar');
+
+
+        if (!$transforms || count($transforms) === 0) {
+            $removePlugins->push('ImageTransforms');
+        }
+
+        $plugins = collect(Plugin::$ckeditorPlugins)
+            ->mapWithKeys(fn(array $plugins, string $import) => [
+                $import => collect($plugins)
+                    ->reject(fn($plugin) => in_array($plugin, $removePlugins->toArray()))
+            ]);
+
+        // $plugins = collect($event->toolbar)
+        //     ->map(function($item) use ($event) {
+        //         Craft::dump($item);
+        //         $exists = collect(Toolbar::items())
+        //             ->some(function($item) {
+        //                 Craft::dump($item);
+        //             });
+        //         Craft::dump($exists);
+        //     });
+        //
+        // die();
         $baseConfigJs = Json::encode($event->baseConfig);
         $toolbarJs = Json::encode($event->toolbar);
         $languageJs = Json::encode([
@@ -961,15 +1004,26 @@ JS;
         $showWordCountJs = Json::encode($this->showWordCount);
         $wordLimitJs = $this->wordLimit ?: 0;
 
+        $configPlugins = '[' . $plugins->flatten()->join(',') . ']';
+
+        $imports = $plugins
+            ->reduce(function(Collection $carry, Collection $plugins, string $import) {
+                $carry->push('import { ' . $plugins->join(', ') . ' } from "' . $import . '";');
+                return $carry;
+            }, Collection::empty())
+            ->join("\n");
+
         $view->registerScript(<<<JS
+$imports
+import {ClassicEditor} from 'ckeditor5';
 import {create} from '@craftcms/ckeditor';
 (($) => {
   const config = Object.assign($baseConfigJs, $configOptionsJs);
-  if (!jQuery.isPlainObject(config.toolbar)) {
+  if (!$.isPlainObject(config.toolbar)) {
     config.toolbar = {};
   }
   config.toolbar.items = $toolbarJs;
-  if (!jQuery.isPlainObject(config.language)) {
+  if (!$.isPlainObject(config.language)) {
     config.language = {};
   }
   config.language = Object.assign($languageJs, config.language);
@@ -983,12 +1037,12 @@ import {create} from '@craftcms/ckeditor';
       const statText = [];
       if (config.wordCount.displayWords || typeof config.wordCount.displayWords === 'undefined') {
         statText.push(Craft.t('ckeditor', '{num, number} {num, plural, =1{word} other{words}}', {
-          num: stats.words,
+          num: stats.words
         }));
       }
       if (config.wordCount.displayCharacters) { // false by default
         statText.push(Craft.t('ckeditor', '{num, number} {num, plural, =1{character} other{characters}}', {
-          num: stats.characters,
+          num: stats.characters
         }));
       }
       const container = $('#' + $wordCountIdJs);
@@ -1003,7 +1057,7 @@ import {create} from '@craftcms/ckeditor';
         }
       }
       onUpdate(stats);
-    }
+    };
   } else {
     extraRemovePlugins.push('WordCount');
   }
@@ -1013,8 +1067,20 @@ import {create} from '@craftcms/ckeditor';
     }
     config.removePlugins.push(...extraRemovePlugins);
   }
-  create($idJs, config);
-})(jQuery)
+  
+  const el = document.querySelector($idJs);
+  
+  if (!el) {
+  return;
+  }
+  
+  ClassicEditor.create(el, {
+    licenseKey: 'GPL',
+    plugins: $configPlugins,
+    ...config
+  })
+  // create($idJs, config);
+})(jQuery);
 JS,
             View::POS_END,
             ['type' => 'module']
@@ -1217,10 +1283,8 @@ JS,
     /**
      * Fill entry card CKE markup (<craft-entry data-entry-id="96"></craft-entry>)
      * with actual card HTML of the entry it's linking to
-
      * Replace the entry card CKE markup (<craft-entry data-entry-id="96"></craft-entry>)
      * with actual card HTML of the entry it's linking to
-
      * Replace the entry card CKE markup (<craft-entry data-entry-id="96"></craft-entry>)
      * with the rendered HTML of the entry it's linking to
      */
@@ -1644,8 +1708,8 @@ JS,
     private function _accessibleFieldName(?ElementInterface $element = null): string
     {
         return Craft::t('site', $this->name) .
-        ($element?->getFieldLayout()?->getField($this->handle)?->required ? ' ' . Craft::t('site', 'Required') : '') .
-        ($this->getIsTranslatable($element) ? ' ' . $this->getTranslationDescription($element) : '');
+            ($element?->getFieldLayout()?->getField($this->handle)?->required ? ' ' . Craft::t('site', 'Required') : '') .
+            ($this->getIsTranslatable($element) ? ' ' . $this->getTranslationDescription($element) : '');
     }
 
     /**

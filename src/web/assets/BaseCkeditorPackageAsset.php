@@ -83,17 +83,24 @@ abstract class BaseCkeditorPackageAsset extends AssetBundle
      */
     public function registerPackage(View $view): void
     {
-        if (!empty($this->pluginNames) || !empty($this->toolbarItems)) {
-            $view->registerScriptWithVars(fn($package) => <<<JS
-import {registerPackage} from '@craftcms/ckeditor';
-registerPackage($package);
-JS, [
-                [
-                    'pluginNames' => $this->pluginNames,
-                    'toolbarItems' => $this->toolbarItems,
-                ],
-            ], View::POS_END, ['type' => 'module']);
+        if (!empty($this->importMap)) {
+            $assetManager = $view->getAssetManager();
+            foreach ($this->importMap as $key => $value) {
+                $view->registerJsImport($key, $assetManager->getAssetUrl($this, $value));
+            }
         }
+
+        //         if (!empty($this->pluginNames) || !empty($this->toolbarItems)) {
+//             $view->registerScriptWithVars(fn($package) => <<<JS
+// import {registerPackage} from '@craftcms/ckeditor';
+// registerPackage($package);
+// JS, [
+//                 [
+//                     'pluginNames' => $this->pluginNames,
+//                     'toolbarItems' => $this->toolbarItems,
+//                 ],
+//             ], View::POS_END, ['type' => 'module']);
+//         }
     }
 
     private function includeTranslation(): void

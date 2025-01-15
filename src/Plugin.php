@@ -53,8 +53,205 @@ class Plugin extends \craft\base\Plugin
 
     private static array $ckeditorPackages = [];
 
+    public static array $pluginButtonMap = [
+        [
+            'plugins' => ['Alignment'],
+            'buttons' => ['alignment']
+        ],
+        // ['plugins' => ['Anchor'], 'buttons' => ['anchor']],
+        [
+            'plugins' => [
+                'AutoImage',
+                // 'CraftImageInsertUI',
+                'Image',
+                'ImageCaption',
+                'ImageStyle',
+                'ImageToolbar',
+                'ImageTransform',
+                'ImageEditor',
+                'LinkImage',
+            ],
+            'buttons' => ['insertImage']
+        ],
+        [
+            'plugins' => ['AutoLink', 'CraftLinkUI', 'LinkEditing', 'LinkImage'],
+            'buttons' => ['link']
+        ],
+        [
+            'plugins' => ['BlockQuote'],
+            'buttons' => ['blockQuote']
+        ],
+        [
+            'plugins' => ['Bold'],
+            'buttons' => ['bold']
+        ],
+        [
+            'plugins' => ['Code'],
+            'buttons' => ['code']
+        ],
+        [
+            'plugins' => ['CodeBlock'],
+            'buttons' => ['codeBlock']
+        ],
+        [
+            'plugins' => ['List', 'ListProperties'],
+            'buttons' => ['bulletedList', 'numberedList']
+        ],
+        [
+            'plugins' => ['Font'],
+            'buttons' => ['fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor']
+        ],
+        [
+            'plugins' => ['FindAndReplace'],
+            'buttons' => ['findAndReplace']
+        ],
+        [
+            'plugins' => ['Heading'],
+            'buttons' => ['heading']
+        ],
+        [
+            'plugins' => ['HorizontalLine'],
+            'buttons' => ['horizontalLine']
+        ],
+        [
+            'plugins' => ['HtmlEmbed'],
+            'buttons' => ['htmlEmbed']
+        ],
+        [
+            'plugins' => ['Indent', 'IndentBlock'],
+            'buttons' => ['outdent', 'indent']
+        ],
+        [
+            'plugins' => ['Italic'],
+            'buttons' => ['italic']
+        ],
+        [
+            'plugins' => ['MediaEmbed', 'MediaEmbedToolbar'],
+            'buttons' => ['mediaEmbed']
+        ],
+        [
+            'plugins' => ['PageBreak'],
+            'buttons' => ['pageBreak']
+        ],
+        [
+            'plugins' => ['RemoveFormat'],
+            'buttons' => ['removeFormat']
+        ],
+        [
+            'plugins' => ['SourceEditing'],
+            'buttons' => ['sourceEditing']
+        ],
+        [
+            'plugins' => ['Strikethrough'],
+            'buttons' => ['strikethrough']
+        ],
+        [
+            'plugins' => ['Style'],
+            'buttons' => ['style']
+        ],
+        [
+            'plugins' => ['Subscript'],
+            'buttons' => ['subscript']
+        ],
+        [
+            'plugins' => ['Superscript'],
+            'buttons' => ['superscript']
+        ],
+        [
+            'plugins' => [
+                'Table',
+                'TableCaption',
+                'TableCellProperties',
+                'TableProperties',
+                'TableToolbar',
+                'TableUI',
+            ],
+            'buttons' => ['insertTable']
+        ],
+        [
+            'plugins' => ['TextPartLanguage'],
+            'buttons' => ['textPartLanguage']
+        ],
+        [
+            'plugins' => ['TodoList'],
+            'buttons' => ['todoList']
+        ],
+        [
+            'plugins' => ['Underline'],
+            'buttons' => ['underline']
+        ],
+        [
+            'plugins' => ['CraftEntries'],
+            'buttons' => ['createEntry']
+        ]
+    ];
+
+    public static array $ckeditorPlugins = [
+        'ckeditor5' => [
+            'Paragraph',
+            'SelectAll',
+            'Clipboard',
+            'Alignment',
+            // 'Anchor',
+            'AutoImage',
+            'AutoLink',
+            'Autoformat',
+            'BlockQuote',
+            'Bold',
+            'Code',
+            'CodeBlock',
+            'List',
+            'ListProperties',
+            'Essentials',
+            'FindAndReplace',
+            'Font',
+            'GeneralHtmlSupport',
+            'Heading',
+            'HorizontalLine',
+            'HtmlComment',
+            'HtmlEmbed',
+            'Image',
+            'ImageCaption',
+            'ImageStyle',
+            'ImageToolbar',
+            'Indent',
+            'IndentBlock',
+            'Italic',
+            'LinkEditing',
+            'LinkImage',
+            'MediaEmbed',
+            'MediaEmbedToolbar',
+            'PageBreak',
+            'PasteFromOffice',
+            'RemoveFormat',
+            'SourceEditing',
+            'Strikethrough',
+            'Style',
+            'Subscript',
+            'Superscript',
+            'Table',
+            'TableCaption',
+            'TableCellProperties',
+            'TableProperties',
+            'TableToolbar',
+            'TableUI',
+            'TextPartLanguage',
+            'TodoList',
+            'Underline',
+            'WordCount',
+        ],
+        '@craftcms/ckeditor' => [
+            'CraftImageInsertUI',
+            'ImageTransform',
+            'ImageEditor',
+            'CraftLinkUI',
+            'CraftEntries',
+        ]
+    ];
+
     public string $schemaVersion = '3.0.0.0';
     public bool $hasCpSettings = true;
+
 
     public function init()
     {

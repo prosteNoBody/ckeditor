@@ -68,7 +68,15 @@ import CraftEntries from './entries/entries';
 import CKEditorInspector from '@ckeditor/ckeditor5-inspector';
 // import {Anchor} from '@northernco/ckeditor5-anchor-drupal';
 
-const allPlugins = [
+export {
+  ImageTransform,
+  ImageEditor,
+  CraftLinkUI,
+  CraftImageInsertUI,
+  CraftEntries
+}
+
+export const allPlugins = [
   Paragraph,
   SelectAll,
   Clipboard,
@@ -133,58 +141,58 @@ export function setLocalizedRefHandles(handles) {
   localizedRefHandles = handles;
 }
 
-const normalizeToolbarItem = (group) => {
-  if (!$.isArray(group)) {
-    group = [group];
-  }
-  return group.map((item) => {
-    if (typeof item === 'string') {
-      item = {button: item};
-    }
-    return item;
-  });
-};
-
-const normalizeToolbarItems = (items) =>
-  items.map((group) => normalizeToolbarItem(group));
-
-export const toolbarItems = normalizeToolbarItems([
-  {button: 'heading', configOption: 'heading'},
-  {button: 'style', configOption: 'style'},
-  {button: 'alignment', configOption: 'alignment'},
-  'bold',
-  'italic',
-  'underline',
-  'strikethrough',
-  'subscript',
-  'superscript',
-  'code',
-  'link',
-  // 'anchor',
-  'textPartLanguage',
-  {button: 'fontSize', configOption: 'fontSize'},
-  'fontFamily',
-  'fontColor',
-  'fontBackgroundColor',
-  'insertImage',
-  'mediaEmbed',
-  'htmlEmbed',
-  'blockQuote',
-  'insertTable',
-  'codeBlock',
-  'bulletedList',
-  'numberedList',
-  'todoList',
-  ['outdent', 'indent'],
-  'horizontalLine',
-  'pageBreak',
-  'removeFormat',
-  'selectAll',
-  'findAndReplace',
-  ['undo', 'redo'],
-  'sourceEditing',
-  'createEntry',
-]);
+// const normalizeToolbarItem = (group) => {
+//   if (!$.isArray(group)) {
+//     group = [group];
+//   }
+//   return group.map((item) => {
+//     if (typeof item === 'string') {
+//       item = {button: item};
+//     }
+//     return item;
+//   });
+// };
+//
+// const normalizeToolbarItems = (items) =>
+//   items.map((group) => normalizeToolbarItem(group));
+//
+// export const toolbarItems = normalizeToolbarItems([
+//   {button: 'heading', configOption: 'heading'},
+//   {button: 'style', configOption: 'style'},
+//   {button: 'alignment', configOption: 'alignment'},
+//   'bold',
+//   'italic',
+//   'underline',
+//   'strikethrough',
+//   'subscript',
+//   'superscript',
+//   'code',
+//   'link',
+//   // 'anchor',
+//   'textPartLanguage',
+//   {button: 'fontSize', configOption: 'fontSize'},
+//   'fontFamily',
+//   'fontColor',
+//   'fontBackgroundColor',
+//   'insertImage',
+//   'mediaEmbed',
+//   'htmlEmbed',
+//   'blockQuote',
+//   'insertTable',
+//   'codeBlock',
+//   'bulletedList',
+//   'numberedList',
+//   'todoList',
+//   ['outdent', 'indent'],
+//   'horizontalLine',
+//   'pageBreak',
+//   'removeFormat',
+//   'selectAll',
+//   'findAndReplace',
+//   ['undo', 'redo'],
+//   'sourceEditing',
+//   'createEntry',
+// ]);
 
 const pluginButtonMap = [
   {plugins: ['Alignment'], buttons: ['alignment']},
@@ -256,7 +264,7 @@ const pluginButtonMap = [
   {plugins: ['CraftEntries'], buttons: ['createEntry']},
 ];
 
-const findPlugin = (pluginName) => {
+export const findPlugin = (pluginName) => {
   for (const [_, v] of Object.entries(CKEditor5)) {
     if (typeof v === 'object') {
       for (const [_, v2] of Object.entries(v)) {
@@ -534,7 +542,7 @@ const handleClipboard = function (editor, plugins) {
 export const pluginNames = () => allPlugins.map((p) => p.pluginName);
 
 export const create = async function (element, config) {
-  let plugins = allPlugins;
+  let plugins = config.plugins || [];
   const removePlugins = [];
 
   if (config.toolbar) {
@@ -626,7 +634,7 @@ export const create = async function (element, config) {
     headingShortcuts(editor, config);
   }
 
-  handleClipboard(editor, plugins);
+  // handleClipboard(editor, plugins);
 
   return editor;
 };
